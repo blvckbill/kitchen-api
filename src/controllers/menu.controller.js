@@ -1,5 +1,6 @@
 import { MenuService } from '../services/menu.service.js';
 import { successResponse } from '../utils/response.js';
+import { serializeMenuCollection, serializeMenuItem } from '../utils/serializer.js';
 
 const menuService = new MenuService();
 
@@ -24,7 +25,9 @@ export const getVendor = async (req, res, next) => {
 export const listVendorMenuItems = async (req, res, next) => {
   try {
     const items = await menuService.listVendorMenuItems(req.params.id);
-    return successResponse(res, items, 'Menu items retrieved');
+    // Transform collection to Naira before serialization
+    const formattedItems = serializeMenuCollection(items);
+    return successResponse(res, formattedItems, 'Menu items retrieved');
   } catch (error) {
     next(error);
   }
@@ -33,7 +36,9 @@ export const listVendorMenuItems = async (req, res, next) => {
 export const getMenuItem = async (req, res, next) => {
   try {
     const item = await menuService.getMenuItem(req.params.id, req.params.itemId);
-    return successResponse(res, item, 'Menu item retrieved');
+    // Transform single item to Naira before serialization
+    const formattedItem = serializeMenuItem(item);
+    return successResponse(res, formattedItem, 'Menu item retrieved');
   } catch (error) {
     next(error);
   }
