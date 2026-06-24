@@ -52,11 +52,12 @@ Read-heavy customer endpoints (`GET /vendors`, `GET /vendors/:id`, `GET /vendors
 **Rate limiting backed by Redis**
 Auth endpoints are limited to 10 requests per 15 minutes. All other endpoints are limited to 60 requests per minute. Rate limit state is stored in Redis rather than in-process memory — this ensures limits are enforced correctly across multiple container instances behind a load balancer.
 
+**Edge-to-Edge Request Tracing**
+Every incoming HTTP request is intercepted at the perimeter by custom tracing middleware that assigns a unique tracking hash via crypto.randomUUID(). This correlation ID is explicitly injected into runtime logs, execution flows, and the global error-handling framework. If an unexpected 500 Server Error occurs, the internal system stack trace is protected for safety, but the unique requestId is bubbled back in the response. This gives support teams or developers a concrete, non-leak diagnostic key to query log aggregators..
+
 **Defensive middleware ordering**
 Rate limiters are placed before authentication middleware on all routes. This ensures expensive operations (database vendor lookup, JWT cryptographic verification) only run on traffic that has already passed the rate limit check — preventing connection pool exhaustion and CPU lock-up under malicious flood traffic.
 
-**Edge-to-Edge Request Tracing**
-Every incoming HTTP request is intercepted at the perimeter by custom tracing middleware that assigns a unique tracking hash via crypto.randomUUID(). This correlation ID is explicitly injected into runtime logs, execution flows, and the global error-handling framework. If an unexpected 500 Server Error occurs, the internal system stack trace is protected for safety, but the unique requestId is bubbled back in the response. This gives support teams or developers a concrete, non-leak diagnostic key to query log aggregators.
 ---
 
 ## Getting Started
