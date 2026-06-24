@@ -2,12 +2,21 @@ import { AppError } from '../utils/errors.js';
 import { errorResponse } from '../utils/response.js';
 
 export const errorHandler = (err, req, res, next) => {
-  console.error(err);
+  console.error(`[${req.requestId}]`, err);
 
   if (err instanceof AppError) {
-    return errorResponse(res, err.message, err.statusCode, err.errorType);
+    return res.status(err.statusCode).json({
+      success: false,
+      message: err.message,
+      error: err.errorType,
+      requestId: req.requestId,
+    });
   }
 
-  // Unexpected errors
-  return errorResponse(res, 'Something went wrong', 500, 'server_error');
+  return res.status(500).json({
+    success: false,
+    message: 'Something went wrong',
+    error: 'server_error',
+    requestId: req.requestId,
+  });
 };
