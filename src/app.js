@@ -4,6 +4,8 @@ import { requestId } from './middlewares/requestId.middleware.js';
 import router from './routes/index.js';
 
 const app = express();
+// Set trust proxy to true if the app is behind a reverse proxy
+app.set('trust proxy', 1);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
