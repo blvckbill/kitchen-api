@@ -15,10 +15,14 @@ const CACHE_KEYS = {
 
 export class MenuService {
   async listVendors() {
+    // Check cache first
     const cached = await getCache(CACHE_KEYS.allVendors);
     if (cached) return cached;
 
+    // Fetch from database if not in cache
     const vendors = await vendorRepository.findAll();
+
+    // Store in cache for future requests
     await setCache(CACHE_KEYS.allVendors, vendors);
     return vendors;
   }

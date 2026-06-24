@@ -1,3 +1,4 @@
+// Custom error classes for the application
 export class AppError extends Error {
   constructor(message, statusCode, errorType) {
     super(message);
@@ -22,12 +23,6 @@ export class UnauthorizedError extends AppError {
 export class ForbiddenError extends AppError {
   constructor(message = 'Forbidden') {
     super(message, 403, 'forbidden');
-  }
-}
-
-export class ValidationError extends AppError {
-  constructor(message = 'Validation failed') {
-    super(message, 422, 'validation_error');
   }
 }
 

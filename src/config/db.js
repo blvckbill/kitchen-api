@@ -3,9 +3,8 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const isProduction = process.env.NODE_ENV === 'production';
-
-const connection = isProduction
+// Database connection configuration
+const connection = process.env.DATABASE_URL
   ? {
       connectionString: process.env.DATABASE_URL,
       ssl: { rejectUnauthorized: false }
@@ -18,6 +17,7 @@ const connection = isProduction
       password: process.env.DB_PASSWORD,
     };
 
+// Knex configuration
 export const knexConfig = {
   client: 'pg',
   connection,
@@ -28,6 +28,7 @@ export const knexConfig = {
 
 const db = knex(knexConfig);
 
+// Initialize the database and run migrations
 export const initializeDatabase = async () => {
   try {
     await db.migrate.latest();
