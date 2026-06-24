@@ -1,0 +1,25 @@
+services:
+  kitchen_redis:
+    restart: always
+    image: "redis:7-alpine"
+    container_name: kitchen_redis_server
+    ports:
+      - "6379:6379"
+
+  kitchen_backend:
+    image: kitchen_backend_image
+    restart: on-failure
+    container_name: kitchen_backend_container
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/home/app/web
+      - /home/app/web/node_modules
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    depends_on:
+      kitchen_redis:
+        condition: service_started
