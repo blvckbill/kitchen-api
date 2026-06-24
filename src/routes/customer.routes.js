@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { requireCustomer } from '../middlewares/auth.middleware.js';
+import { authRateLimiter, generalRateLimiter } from '../middlewares/rateLimiter.middleware.js';
 import {
   register,
   login,
@@ -15,17 +16,16 @@ import {
 
 const router = Router();
 
-// Auth — public
-router.post('/auth/register', register);
-router.post('/auth/login', login);
-router.post('/auth/refresh', refresh);
-
-
-// protected
-router.get('/vendors', requireCustomer, listVendors);
-router.get('/vendors/:id', requireCustomer, getVendor);
-router.get('/vendors/:id/menu', requireCustomer, listVendorMenuItems);
-router.get('/vendors/:id/menu/:itemId', requireCustomer, getMenuItem);
+// Auth — rate limiter
+router.post('/auth/register', authRateLimiter, register);
+router.post('/auth/login', authRateLimiter, login);
+router.post('/auth/refresh', authRateLimiter, refresh);
 router.post('/auth/logout', requireCustomer, logout);
+
+// Browsing — rate limiter
+router.get('/vendors', generalRateLimiter, requireCustomer, listVendors);
+router.get('/vendors/:id', generalRateLimiter, requireCustomer, getVendor);
+router.get('/vendors/:id/menu', generalRateLimiter, requireCustomer, listVendorMenuItems);
+router.get('/vendors/:id/menu/:itemId', generalRateLimiter, requireCustomer, getMenuItem);
 
 export default router;

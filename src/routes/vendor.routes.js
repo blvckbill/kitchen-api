@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { requireVendor } from '../middlewares/requireVendor.js';
+import { generalRateLimiter } from '../middlewares/rateLimiter.middleware.js';
 import {
   listMenuItems,
   createMenuItem,
@@ -9,6 +10,7 @@ import {
 
 const router = Router();
 
+router.use(generalRateLimiter);
 router.use(requireVendor);
 
 router.get('/menu', listMenuItems);
