@@ -1,9 +1,15 @@
 import { VendorRepository } from '../repositories/vendor.repository.js';
 import { MenuRepository } from '../repositories/menu.repository.js';
 import { NotFoundError } from '../utils/errors.js';
+import { deleteCache, deleteCacheByPattern } from '../utils/cache.js';
 
 const vendorRepository = new VendorRepository();
 const menuRepository = new MenuRepository();
+
+const invalidateVendorMenuCache = async (vendorId) => {
+  await deleteCache(`vendors:${vendorId}:menu`);
+  await deleteCacheByPattern(`vendors:${vendorId}:menu:*`);
+};
 
 export class VendorService {
   async listMenuItems(vendorId) {
@@ -11,7 +17,9 @@ export class VendorService {
   }
 
   async createMenuItem(vendorId, data) {
-    return menuRepository.create({ ...data, vendor_id: vendorId });
+    const item = await menuRepository.create({ ...data, vendor_id: vendorId });
+    await invalidateVendorMenuCache(vendorId);
+    return item;
   }
 
   async updateMenuItem(vendorId, itemId, data) {
@@ -19,6 +27,7 @@ export class VendorService {
     if (!item) {
       throw new NotFoundError('Menu item not found or does not belong to your restaurant');
     }
+    await invalidateVendorMenuCache(vendorId);
     return item;
   }
 
@@ -27,5 +36,6 @@ export class VendorService {
     if (!deleted) {
       throw new NotFoundError('Menu item not found or does not belong to your restaurant');
     }
+    await invalidateVendorMenuCache(vendorId);
   }
 }
