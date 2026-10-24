@@ -13,6 +13,13 @@ export const up = async (knex) => {
     table.index('vendor_id', 'idx_menu_items_vendor_id');
     table.index('is_available', 'idx_menu_items_is_available');
     table.index('category', 'idx_menu_items_category');
+    // id
+    // menu_item_id
+    // url
+    // public_id
+    // position
+
+    //index menu_item_id
   });
 };
 
